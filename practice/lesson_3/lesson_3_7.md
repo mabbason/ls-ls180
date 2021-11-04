@@ -27,6 +27,7 @@ Quantity	Product
 25	small bolt
 15	large bolt
 
+<<<<<<< HEAD
 INSERT INTO products
 (name)
 VALUES
@@ -39,6 +40,8 @@ VALUES
 (1, 10),
 (1, 25), 
 (2, 15);
+=======
+>>>>>>> 72cdd95ddc3d97eae34cbf4af1ddc9c10dcae07c
 
 # Write a SQL statement that returns a result like this:
 
@@ -49,6 +52,7 @@ VALUES
        15 | large bolt
 (3 rows)
 
+<<<<<<< HEAD
 SELECT orders.quantity, products.name FROM
 orders INNER JOIN products
 ON products.id=orders.product_id;
@@ -73,6 +77,16 @@ It will error, because there is already a NULL value in the table.
 DELETE FROM orders WHERE id=4;
 ALTER TABLE orders ALTER COLUMN product_id SET NOT NULL;
 
+=======
+
+# Can you insert a row into orders without a product_id? Write a SQL statement to prove your answer.
+
+# Write a SQL statement that will prevent NULL values from being stored in orders.product_id. What happens if you execute that statement?
+
+
+# Make any changes needed to avoid the error message encountered in #6.
+
+>>>>>>> 72cdd95ddc3d97eae34cbf4af1ddc9c10dcae07c
 # Create a new table called reviews to store the data shown below. This table should include a primary key and a reference to the products table.
 Product	Review
 small bolt	a little small
