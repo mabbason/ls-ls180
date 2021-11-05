@@ -54,3 +54,67 @@ ALTER TABLE stars ADD CONSTRAINT spectral_value_check
 CHECK(spectral_type IN ('O', 'B', 'A', 'F', 'G', 'K', 'M'));
 
 ALTER TABLE stars ALTER COLUMN spectral_type SET NOT NULL;
+
+# In the previous exercise, we added a CHECK constraint to the stars table to enforce that the value stored in the spectral_type column for each row is valid. In this exercise, we will use an alternate approach to the same problem.
+
+# PostgreSQL provides what is called an enumerated data type; that is, a data type that must have one of a finite set of values. For instance, a traffic light can be red, green, or yellow: these are enumerate values for the color of the currently lit signal light.
+
+# Modify the stars table to remove the CHECK constraint on the spectral_type column, and then modify the spectral_type column so it becomes an enumerated type that restricts it to one of the following 7 values: 'O', 'B', 'A', 'F', 'G', 'K', and 'M'.
+
+extrasolar=# ALTER TABLE stars
+extrasolar-# DROP CONSTRAINT spectral_value_check;
+ALTER TABLE
+extrasolar=# CREATE TYPE spectral_type AS ENUM ('O', 'B', 'A', 'F', 'G', 'K', 'M');
+CREATE TYPE
+extrasolar=# ALTER TABLE stars
+extrasolar-# ALTER COLUMN spectral_type TYPE spectral_type;
+ERROR:  column "spectral_type" cannot be cast automatically to type spectral_type
+HINT:  You might need to specify "USING spectral_type::spectral_type".
+extrasolar=# DROP TYPE spectral_type;
+DROP TYPE
+extrasolar=# CREATE TYPE spectral_type_enum AS ENUM ('O', 'B', 'A', 'F', 'G', 'K', 'M');
+CREATE TYPE
+extrasolar=# ALTER TABLE stars
+ALTER COLUMN spectral_type TYPE spectral_type_enum;
+ERROR:  column "spectral_type" cannot be cast automatically to type spectral_type_enum
+HINT:  You might need to specify "USING spectral_type::spectral_type_enum".
+extrasolar=# ALTER TABLE stars
+ALTER COLUMN spectral_type TYPE spectral_type_enum USING spectral_type::spectral_type_enum;
+ALTER TABLE
+extrasolar=# 
+
+
+# We will measure Planetary masses in terms of the mass of Jupiter. As such, the current data type of integer is inappropriate; it is only really useful for planets as large as Jupiter or larger. These days, we know of many extrasolar planets that are smaller than Jupiter, so we need to be able to record fractional parts for the mass. Modify the mass column in the planets table so that it allows fractional masses to any degree of precision required. In addition, make sure the mass is required and positive. While we're at it, also make the designation column required.
+
+extrasolar=# ALTER TABLE planets
+extrasolar-# ALTER COLUMN designation SET NOT NULL,
+extrasolar-# ALTER COLUMN mass SET NOT NULL,
+extrasolar-# ALTER COLUMN mass TYPE numeric;
+ALTER TABLE
+extrasolar=# ALTER TABLE planets
+extrasolar-# ADD CONSTRAINT mass_non_zero CHECK(mass > 0.00);
+ALTER TABLE
+
+# Add a semi_major_axis column for the semi-major axis of each planet's orbit; the semi-major axis is the average distance from the planet's star as measured in astronomical units (1 AU is the average distance of the Earth from the Sun). Use a data type of numeric, and require that each planet have a value for the semi_major_axis.
+
+extrasolar=# ALTER TABLE planets
+extrasolar-# ADD COLUMN semi_major_axis numeric NOT NULL;
+
+# Someday in the future, technology will allow us to start observing the moons of extrasolar planets. At that point, we're going to need a moons table in our extrasolar database. For this exercise, your task is to add that table to the database. The table should include the following data:
+
+# id: a unique serial number that auto-increments and serves as a primary key for this table.
+# designation: the designation of the moon. We will assume that moon designations will be numbers, with the first moon discovered for each planet being moon 1, the second moon being moon 2, etc. The designation is required.
+# semi_major_axis: the average distance in kilometers from the planet when a moon is farthest from its corresponding planet. This field must be a number greater than 0, but is not required; it may take some time before we are able to measure moon-to-planet distances in extrasolar systems.
+# mass: the mass of the moon measured in terms of Earth Moon masses. This field must be a numeric value greater than 0, but is not required.
+# Make sure you also specify any foreign keys necessary to tie each moon to other rows in the database.
+
+CREATE TABLE moons (
+extrasolar(# id serial PRIMARY KEY,
+extrasolar(# designation int NOT NULL CHECK(designation > 0),
+extrasolar(# semi_major_axis numeric CHECK(semi_major_axis > 0),
+extrasolar(# mass numeric CHECK(mass > 0),
+extrasolar(# planet_id int NOT NULL REFERENCES planets(id)
+);
+
+
+
